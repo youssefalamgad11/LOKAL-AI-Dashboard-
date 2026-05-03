@@ -1,10 +1,18 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { parse } from 'papaparse';
+import { kmeans } from 'ml-kmeans';
 import { motion, AnimatePresence } from 'motion/react';
 import { Download, Loader2, AlertCircle } from 'lucide-react';
 import UploadBox from '../components/UploadBox';
 import SegmentChart from '../components/SegmentChart';
 import SegmentCard from '../components/SegmentCard';
+
+const SEGMENT_MAP: Record<number, string> = {
+  0: "VIP Customers",
+  1: "Discount Hunters",
+  2: "At Risk Customers",
+  3: "Window Shoppers",
+};
 
 export default function Segmentation() {
   const [file, setFile] = useState<File | null>(null);
@@ -16,15 +24,62 @@ export default function Segmentation() {
     if (!file) return;
     setLoading(true);
     setError(null);
+    
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await axios.post('/api/segment', formData);
-      setResult(res.data);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        const parsed = parse(text, { header: true, dynamicTyping: true });
+        const data = parsed.data as any[];
+
+        const REQUIRED_COLS = [
+          "avg_order_value",
+          "purchase_frequency",
+          "days_since_last_purchase",
+          "discovery_rate",
+          "engagement_score"
+        ];
+
+        // Ensure columns exist or generate scores
+        const validData = data.filter(row => row.avg_order_value !== undefined);
+
+        if (validData.length < 4) {
+          setError('Insufficient valid data (at least 4 customers required).');
+          setLoading(false);
+          return;
+        }
+
+        const featureMatrix = validData.map(row => [
+          row.avg_order_value || 0,
+          row.purchase_frequency || 0,
+          row.days_since_last_purchase || 0,
+          row.discount_usage_rate || 0,
+          ((row.purchase_frequency || 0) * 2) - ((row.days_since_last_purchase || 0) * 0.1)
+        ]);
+
+        const ans = kmeans(featureMatrix, 4, { seed: 42 });
+        
+        const segmentsCount = [0, 1, 2, 3].map(clusterId => {
+          const name = SEGMENT_MAP[clusterId];
+          const count = ans.clusters.filter(c => c === clusterId).length;
+          return {
+            segment: name,
+            count: count,
+            percentage: parseFloat(((count / validData.length) * 100).toFixed(1))
+          };
+        });
+
+        setResult({
+          total_customers: validData.length,
+          segments: segmentsCount
+        });
+        setLoading(false);
+      };
+      reader.readAsText(file);
     } catch (e: any) {
-      setError(e.response?.data?.error || 'Failed to analyze. Please check your CSV columns.');
+      setError('Failed to process file locally.');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

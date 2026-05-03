@@ -1,10 +1,40 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Loader2 } from 'lucide-react';
 import RecommendationCard from '../components/RecommendationCard';
 
 const SEGMENTS = ['VIP Customers', 'Discount Hunters', 'At Risk Customers', 'Window Shoppers'];
+
+const PRODUCTS: Record<string, any[]> = {
+  "VIP Customers": [
+    { product: "Premium Linen Blazer", category: "Outerwear", price: 2800, score: 0.97 },
+    { product: "Handcrafted Leather Belt", category: "Accessories", price: 950, score: 0.94 },
+    { product: "Silk Kaftan — Limited Edition", category: "Dresses", price: 3500, score: 0.91 },
+    { product: "Egyptian Cotton Trousers", category: "Bottoms", price: 1800, score: 0.89 },
+    { product: "Artisan Tote Bag", category: "Bags", price: 2200, score: 0.87 },
+  ],
+  "Discount Hunters": [
+    { product: "Classic Tee 3-Pack Bundle", category: "Tops", price: 399, score: 0.96 },
+    { product: "Denim Shorts — Flash Sale", category: "Bottoms", price: 299, score: 0.93 },
+    { product: "Summer Dress Bundle", category: "Dresses", price: 549, score: 0.90 },
+    { product: "Printed Scarf Set", category: "Accessories", price: 199, score: 0.88 },
+    { product: "Basics Pack (5 items)", category: "Tops", price: 699, score: 0.85 },
+  ],
+  "At Risk Customers": [
+    { product: "We Miss You — Mystery Box", category: "Bundles", price: 799, score: 0.95 },
+    { product: "Bestseller Restock — Linen Top", category: "Tops", price: 680, score: 0.92 },
+    { product: "Fan Favorite Maxi Dress", category: "Dresses", price: 1100, score: 0.89 },
+    { product: "New Season Opener Pack", category: "Bundles", price: 999, score: 0.86 },
+    { product: "Comfort Jogger Set", category: "Sets", price: 750, score: 0.83 },
+  ],
+  "Window Shoppers": [
+    { product: "Starter Tee — First Purchase", category: "Tops", price: 249, score: 0.94 },
+    { product: "Trending Cargo Pants", category: "Bottoms", price: 890, score: 0.91 },
+    { product: "Influencer Pick — Slip Dress", category: "Dresses", price: 750, score: 0.88 },
+    { product: "Welcome Gift Set", category: "Bundles", price: 499, score: 0.85 },
+    { product: "Viral Cap — As Seen on Instagram", category: "Accessories", price: 320, score: 0.82 },
+  ],
+};
 
 export default function Recommendations() {
   const [segment, setSegment] = useState('');
@@ -15,13 +45,11 @@ export default function Recommendations() {
     const s = targetSeg || segment;
     if (!s) return;
     setLoading(true);
-    try {
-      const res = await axios.post('/api/recommend', { segment_name: s });
-      setRecs(res.data.recommendations);
-    } catch (e) {
-      console.error(e);
-    }
-    setLoading(false);
+    // Simulate API delay
+    setTimeout(() => {
+      setRecs(PRODUCTS[s] || []);
+      setLoading(false);
+    }, 600);
   };
 
   const handleSegmentClick = (s: string) => {

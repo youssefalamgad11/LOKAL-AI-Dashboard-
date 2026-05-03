@@ -10,7 +10,7 @@ export default function UploadBox({ onFile }: UploadBoxProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'text/csv': ['.csv'] },
-    onDrop: files => {
+    onDrop: (files: File[]) => {
       if (files[0]) {
         setFileName(files[0].name);
         onFile(files[0]);
