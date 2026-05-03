@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lokal-green: #BEFF04;
+  --color-lokal-black: #0A0A0A;
+  --color-lokal-dark: #111111;
+  --color-lokal-gray: #1E1E1E;
+  --color-lokal-mid: #2A2A2A;
+  --color-lokal-white: #F5F5F0;
+  --color-lokal-muted: #888888;
+  --color-lokal-accent: #D4FF3C;
+
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-lokal-black);
+    color: var(--color-lokal-white);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .lokal-btn {
+    @apply bg-lokal-green text-lokal-black font-black tracking-[0.12em] uppercase rounded-lg px-7 py-3 cursor-pointer text-sm transition-colors hover:bg-lokal-accent disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .lokal-card {
+    @apply bg-lokal-dark border border-lokal-mid rounded-xl p-6;
+  }
+
+  .lokal-label {
+    @apply text-lokal-green text-[11px] font-bold tracking-[0.18em] uppercase;
+  }
+}
