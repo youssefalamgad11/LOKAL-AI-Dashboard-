@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -12,8 +12,8 @@ import Recommendations from './pages/Recommendations';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen flex flex-col selection:bg-lokal-green selection:text-lokal-black">
+    <HashRouter>
+      <div className="min-h-screen flex flex-col selection:bg-lokal-green selection:text-lokal-black text-lokal-white font-sans">
         <Navbar />
         <main className="flex-grow">
           <Routes>
@@ -24,7 +24,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
